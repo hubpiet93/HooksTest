@@ -17,7 +17,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Pobierz domyślną gałąź (main/master)
+            // Pobierz domyślną gałąź (main/master/inne)
             const repoInfo = await github.rest.repos.get({
               owner: context.repo.owner,
               repo: context.repo.repo
@@ -25,13 +25,13 @@ jobs:
             const defaultBranch = repoInfo.data.default_branch;
             console.log(`Default branch: ${defaultBranch}`);
 
-            // Sprawdź czy event jest na głównym branchu
+            // Sprawdź czy push był na domyślną gałąź
             if (context.ref !== `refs/heads/${defaultBranch}`) {
-              console.log(`Push był na ${context.ref}, nie na gałęzi głównej (${defaultBranch}), więc pomijam logikę workflow.`);
+              console.log(`Push był na ${context.ref}, nie na domyślną gałąź (${defaultBranch}). Workflow kończy działanie.`);
               return;
             }
 
-            // Szukaj PR-ów do tej gałęzi
+            // --- TYLKO JEŚLI PUSH BYŁ NA GAŁĄŹ GŁÓWNĄ, RESZTA LOGIKI ---
             const prs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
