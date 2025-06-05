@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   check-prs:
     runs-on: ubuntu-latest
@@ -31,7 +35,6 @@ jobs:
               });
               console.log(`PR #${pr.number}: status porównania względem main: ${compare.data.status}`);
               if (["behind", "diverged"].includes(compare.data.status)) {
-                // Sprawdź czy już jest komentarz
                 const comments = await github.rest.issues.listComments({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
