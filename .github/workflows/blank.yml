@@ -17,14 +17,14 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: "open",
-              base: "master"
+              base: "main"
             });
             for (const pr of prs.data) {
               const compare = await github.rest.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 base: pr.head.sha,
-                head: "master"
+                head: "main"
               });
               if (compare.data.status === "behind") {
                 const comments = await github.rest.issues.listComments({
@@ -33,14 +33,14 @@ jobs:
                   issue_number: pr.number
                 });
                 const alreadyCommented = comments.data.some(c =>
-                  c.body.includes("❗️Ten PR wymaga synchronizacji z masterem")
+                  c.body.includes("❗️Ten PR wymaga synchronizacji z main")
                 );
                 if (!alreadyCommented) {
                   await github.rest.issues.createComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: pr.number,
-                    body: "❗️Ten PR wymaga synchronizacji z masterem. Proszę zmergować lub zrebase'ować aktualny master do tej gałęzi."
+                    body: "❗️Ten PR wymaga synchronizacji z main. Proszę zmergować lub zrebase'ować aktualny main do tej gałęzi."
                   });
                 }
               }
