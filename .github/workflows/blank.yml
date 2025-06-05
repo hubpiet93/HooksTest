@@ -23,13 +23,13 @@ jobs:
               repo: context.repo.repo
             });
             const defaultBranch = repoInfo.data.default_branch;
-            console.log(`Default branch: ${defaultBranch}`);
-
-            // Sprawdź czy push był na domyślną gałąź
+            console.log(`context.ref: ${context.ref}`);
+            console.log(`defaultBranch: ${defaultBranch}`);
             if (context.ref !== `refs/heads/${defaultBranch}`) {
-              console.log(`Push był na ${context.ref}, nie na domyślną gałąź (${defaultBranch}). Workflow kończy działanie.`);
+              console.log(`WARUNEK: Push był na ${context.ref}, nie na domyślną gałąź (${defaultBranch}) – kończymy`);
               return;
             }
+            console.log('WARUNEK: Push był na domyślną gałąź – wykonujemy logikę');
 
             // --- TYLKO JEŚLI PUSH BYŁ NA GAŁĄŹ GŁÓWNĄ, RESZTA LOGIKI ---
             const prs = await github.rest.pulls.list({
