@@ -30,7 +30,7 @@ jobs:
                 head: "main"
               });
               console.log(`PR #${pr.number}: status porównania względem main: ${compare.data.status}`);
-              if (compare.data.status === "behind") {
+              if (["behind", "diverged"].includes(compare.data.status)) {
                 // Sprawdź czy już jest komentarz
                 const comments = await github.rest.issues.listComments({
                   owner: context.repo.owner,
@@ -53,7 +53,7 @@ jobs:
                   console.log(`PR #${pr.number}: Komentarz już istnieje`);
                 }
               } else {
-                console.log(`PR #${pr.number}: Branch nie jest behind względem main`);
+                console.log(`PR #${pr.number}: Branch nie jest behind/diverged względem main`);
               }
             }
             console.log("Koniec skryptu");
