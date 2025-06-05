@@ -3,7 +3,7 @@ name: Notify Outdated PRs
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   check-prs:
