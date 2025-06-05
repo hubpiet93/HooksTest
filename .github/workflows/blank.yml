@@ -25,6 +25,12 @@ jobs:
             const defaultBranch = repoInfo.data.default_branch;
             console.log(`Default branch: ${defaultBranch}`);
 
+            // Sprawdź czy event jest na głównym branchu
+            if (context.ref !== `refs/heads/${defaultBranch}`) {
+              console.log(`Push był na ${context.ref}, nie na gałęzi głównej (${defaultBranch}), więc pomijam logikę workflow.`);
+              return;
+            }
+
             // Szukaj PR-ów do tej gałęzi
             const prs = await github.rest.pulls.list({
               owner: context.repo.owner,
