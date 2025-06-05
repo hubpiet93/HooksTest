@@ -13,20 +13,25 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            console.log("Start script: Szukam otwartych PR-ów do main...");
             const prs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: "open",
               base: "main"
             });
+            console.log(`Znaleziono PR-ów: ${prs.data.length}`);
             for (const pr of prs.data) {
+              console.log(`Sprawdzam PR #${pr.number} (${pr.title})`);
               const compare = await github.rest.repos.compareCommits({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 base: pr.head.sha,
                 head: "main"
               });
+              console.log(`PR #${pr.number}: status porównania względem main: ${compare.data.status}`);
               if (compare.data.status === "behind") {
+                // Sprawdź czy już jest komentarz
                 const comments = await github.rest.issues.listComments({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -35,6 +40,7 @@ jobs:
                 const alreadyCommented = comments.data.some(c =>
                   c.body.includes("❗️Ten PR wymaga synchronizacji z main")
                 );
+                console.log(`PR #${pr.number}: alreadyCommented = ${alreadyCommented}`);
                 if (!alreadyCommented) {
                   await github.rest.issues.createComment({
                     owner: context.repo.owner,
@@ -42,6 +48,12 @@ jobs:
                     issue_number: pr.number,
                     body: "❗️Ten PR wymaga synchronizacji z main. Proszę zmergować lub zrebase'ować aktualny main do tej gałęzi."
                   });
+                  console.log(`Dodano komentarz do PR #${pr.number}`);
+                } else {
+                  console.log(`PR #${pr.number}: Komentarz już istnieje`);
                 }
+              } else {
+                console.log(`PR #${pr.number}: Branch nie jest behind względem main`);
               }
             }
+            console.log("Koniec skryptu");
